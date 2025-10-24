@@ -31,7 +31,7 @@ class _ModuleNavigatorState extends State<ModuleNavigator> {
 
   @override
   Widget build(BuildContext context) {
-    return Provider(
+    return Provider<ValueNotifier<bool>>(
       create: (_) => _canPopNotifier,
       child: ValueListenableBuilder<bool>(
         valueListenable: _canPopNotifier,
