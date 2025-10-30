@@ -6,12 +6,12 @@ import 'observer.dart';
 class ModuleNavigator extends StatefulWidget {
   const ModuleNavigator({
     super.key,
-    required this.navKey,
     required this.onGenerateRoute,
     required this.onGenerateInitialRoutes,
+    this.navKey,
   });
 
-  final GlobalKey<NavigatorState> navKey;
+  final GlobalKey<NavigatorState>? navKey;
   final Route<dynamic>? Function(RouteSettings)? onGenerateRoute;
   final List<Route<dynamic>> Function(NavigatorState, String)
   onGenerateInitialRoutes;
@@ -22,12 +22,19 @@ class ModuleNavigator extends StatefulWidget {
 
 class _ModuleNavigatorState extends State<ModuleNavigator> {
   final _canPopNotifier = ValueNotifier<bool>(true);
-  GlobalKey<NavigatorState> get navKey => widget.navKey;
+  late final GlobalKey<NavigatorState> _navKey;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _navKey = widget.navKey ?? GlobalKey<NavigatorState>();
+  }
 
   void _updateCanPop() {
-    if (navKey.currentState == null) return;
+    if (_navKey.currentState == null) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _canPopNotifier.value = !navKey.currentState!.canPop();
+      _canPopNotifier.value = !_navKey.currentState!.canPop();
     });
   }
 
@@ -40,7 +47,7 @@ class _ModuleNavigatorState extends State<ModuleNavigator> {
         builder: (context, canPop, child) =>
             PopScope(canPop: canPop, child: child!),
         child: Navigator(
-          key: navKey,
+          key: _navKey,
           observers: [Observer(onChanged: _updateCanPop)],
           onGenerateInitialRoutes: widget.onGenerateInitialRoutes,
           onGenerateRoute: widget.onGenerateRoute,
