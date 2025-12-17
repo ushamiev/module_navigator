@@ -7,14 +7,15 @@ class ModuleNavigator extends StatefulWidget {
   const ModuleNavigator({
     super.key,
     required this.onGenerateRoute,
-    required this.onGenerateInitialRoutes,
+    this.onGenerateInitialRoutes,
+    this.initialRoute,
     this.navKey,
   });
 
   final GlobalKey<NavigatorState>? navKey;
   final Route<dynamic>? Function(RouteSettings)? onGenerateRoute;
-  final List<Route<dynamic>> Function(NavigatorState, String)
-  onGenerateInitialRoutes;
+  final List<Route<dynamic>> Function(NavigatorState, String)? onGenerateInitialRoutes;
+  final String? initialRoute;
 
   @override
   State<ModuleNavigator> createState() => _ModuleNavigatorState();
@@ -44,12 +45,12 @@ class _ModuleNavigatorState extends State<ModuleNavigator> {
       create: (_) => _canPopNotifier,
       child: ValueListenableBuilder<bool>(
         valueListenable: _canPopNotifier,
-        builder: (context, canPop, child) =>
-            PopScope(canPop: canPop, child: child!),
+        builder: (context, canPop, child) => PopScope(canPop: canPop, child: child!),
         child: Navigator(
           key: _navKey,
+          initialRoute: widget.initialRoute,
           observers: [Observer(onChanged: _updateCanPop)],
-          onGenerateInitialRoutes: widget.onGenerateInitialRoutes,
+          onGenerateInitialRoutes: widget.onGenerateInitialRoutes ?? Navigator.defaultGenerateInitialRoutes,
           onGenerateRoute: widget.onGenerateRoute,
         ),
       ),
